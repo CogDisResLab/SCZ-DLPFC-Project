@@ -1,4 +1,4 @@
-if (interactie()) {
+if (interactive()) {
   if (file.exists("~/.Rprofile")) {
     source("~/.Rprofile")
   }
