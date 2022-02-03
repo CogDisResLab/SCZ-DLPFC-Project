@@ -1,0 +1,9 @@
+PamChip Location	Barcode	Row	Col	Array	Visual QC	PI PamGene	Operator	Project	Article number	Strip	Sample name	Comment 1	Comment 2	Comment 3	Comment 4
+1	710144413	1	1	A1	OK	NA	NA	NA	87102	1	Female CT	CT	female	Na	Na	
+1	710144413	2	1	A2	OK	NA	NA	NA	87102	1	Female SCHZ	schz	female	Na	Na	
+1	710144413	3	1	A3	OK	NA	NA	NA	87102	1	Male CT	CT	male	Na	Na	
+1	710144413	4	1	A4	OK	NA	NA	NA	87102	1	Male SCHZ	schz	male	Na	Na	
+2	710144414	1	1	A1	OK	NA	NA	NA	87102	2	Female CT	CT	female	Na	Na	
+2	710144414	2	1	A2	OK	NA	NA	NA	87102	2	Female SCHZ	schz	female	Na	Na	
+2	710144414	3	1	A3	OK	NA	NA	NA	87102	2	Male CT	CT	male	Na	Na	
+2	710144414	4	1	A4	OK	NA	NA	NA	87102	2	Male SCHZ	schz	male	Na	Na	
