@@ -10,11 +10,15 @@ create_dir <- function(path) {
 
 results_dir <- "results"
 data_dir <- "data"
+krsa_pair_data <- file.path(data_dir, "KRSA_Reports")
+uka_pair_data <- file.path(data_dir, "UKA_Reports")
+kea3_pair_data <- file.path(data_dir, "KEA3_Reports")
 figures_dir <- "figures"
 depot_dir <- "depot"
 
 
-all_dirs <- c(results_dir, data_dir, figures_dir, depot_dir)
+all_dirs <- c(results_dir, data_dir, figures_dir, depot_dir,
+              krsa_pair_data, kea3_pair_data, uka_pair_data)
 
 all_dirs |>
   walk(create_dir)
