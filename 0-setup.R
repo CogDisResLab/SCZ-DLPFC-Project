@@ -9,6 +9,7 @@ create_dir <- function(path) {
 }
 
 results_dir <- "results"
+creedenzymatic_results_dir <- file.path(results_dir, "creedenzymatic")
 data_dir <- "data"
 krsa_pair_data <- file.path(data_dir, "KRSA_Reports")
 uka_pair_data <- file.path(data_dir, "UKA_Reports")
@@ -17,11 +18,12 @@ region_data <- file.path(data_dir, "Region-Data")
 figures_dir <- "figures"
 depot_dir <- "depot"
 ancillary_dir <- "ancillary"
+creedenzymatic_figure_dir <- file.path(figures_dir, "creedenzymatic")
 
 
 all_dirs <- c(results_dir, data_dir, figures_dir, depot_dir,
               krsa_pair_data, kea3_pair_data, uka_pair_data,
-              region_data, ancillary_dir)
+              region_data, ancillary_dir, creedenzymatic_figure_dir, creedenzymatic_results_dir)
 
 all_dirs |>
   walk(create_dir)
