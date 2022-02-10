@@ -33,8 +33,9 @@ drug_full_name <- function(full_name) {
 v_drug_name <- Vectorize(drug_full_name)
 
 clean_data <- raw_data |>
-  filter(HGNC_Symbol %in% genes) |>
   select(-ecdfPlot) |>
   mutate(drug = v_drug_name(DataSet)) |>
+  write_csv("data/kaleidoscope_data/KS_AP_records.csv") |>
+  filter(HGNC_Symbol %in% genes) |>
   write_csv("results/antipsychotic_gene_lookups.csv")
 
