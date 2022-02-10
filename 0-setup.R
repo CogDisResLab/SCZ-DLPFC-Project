@@ -16,6 +16,7 @@ uka_pair_data <- file.path(data_dir, "UKA_Reports")
 kea3_pair_data <- file.path(data_dir, "KEA3_Reports")
 region_data <- file.path(data_dir, "Region-Data")
 pooled_pairwise_data <- file.path(data_dir, "Pooled-Data")
+kaleidoscope_data_dir <- file.path(data_dir, "kaleidoscope_data")
 figures_dir <- "figures"
 depot_dir <- "depot"
 ancillary_dir <- "ancillary"
@@ -25,7 +26,8 @@ reverse_krsa_figure_dir <- file.path(figures_dir, "reverse_krsa")
 
 all_dirs <- c(results_dir, data_dir, figures_dir, depot_dir,
               krsa_pair_data, kea3_pair_data, uka_pair_data,
-              region_data, ancillary_dir, creedenzymatic_figure_dir, creedenzymatic_results_dir, pooled_pairwise_data, reverse_krsa_figure_dir)
+              region_data, ancillary_dir, creedenzymatic_figure_dir, creedenzymatic_results_dir, pooled_pairwise_data, reverse_krsa_figure_dir,
+              kaleidoscope_data_dir)
 
 all_dirs |>
   walk(create_dir)
