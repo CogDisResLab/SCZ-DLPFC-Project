@@ -20,4 +20,4 @@ final_top_peptides <- top_pep_files |>
   select(-X) |>
   mutate(Source = if_else(str_detect(Source, "ERK5"), "ERK5", Source)) |>
   unique() |>
-  write_csv("data/top_peptides_per_recombinant_kinase.csv")
+  write_csv("data/selected_peptide_data/top_peptides_per_recombinant_kinase.csv")
