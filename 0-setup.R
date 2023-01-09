@@ -9,7 +9,8 @@ create_dir <- function(path) {
 }
 
 results_dir <- "results"
-creedenzymatic_results_dir <- file.path(results_dir, "creedenzymatic")
+creedenzymatic_results_dir <-
+  file.path(results_dir, "creedenzymatic")
 data_dir <- "data"
 krsa_pair_data <- file.path(data_dir, "KRSA_Reports")
 uka_pair_data <- file.path(data_dir, "UKA_Reports")
@@ -18,18 +19,37 @@ region_data <- file.path(data_dir, "Region-Data")
 rats_data <- file.path(data_dir, "Rats-Data")
 pooled_pairwise_data <- file.path(data_dir, "Pooled-Data")
 kaleidoscope_data_dir <- file.path(data_dir, "kaleidoscope_data")
-selected_peptide_data_dir <- file.path(data_dir, "selected_peptide_data")
+selected_peptide_data_dir <-
+  file.path(data_dir, "selected_peptide_data")
 figures_dir <- "figures"
 depot_dir <- "depot"
 ancillary_dir <- "ancillary"
-creedenzymatic_figure_dir <- file.path(figures_dir, "creedenzymatic")
+creedenzymatic_figure_dir <-
+  file.path(figures_dir, "creedenzymatic")
 reverse_krsa_figure_dir <- file.path(figures_dir, "reverse_krsa")
+recombinant_peptide_figure_dir <-
+  file.path(figures_dir, "recombinant_peptide")
 
 
-all_dirs <- c(results_dir, data_dir, figures_dir, depot_dir,
-              krsa_pair_data, kea3_pair_data, uka_pair_data,
-              region_data, ancillary_dir, creedenzymatic_figure_dir, creedenzymatic_results_dir, pooled_pairwise_data, reverse_krsa_figure_dir,
-              kaleidoscope_data_dir, rats_data, selected_peptide_data_dir)
+all_dirs <- c(
+  results_dir,
+  data_dir,
+  figures_dir,
+  depot_dir,
+  krsa_pair_data,
+  kea3_pair_data,
+  uka_pair_data,
+  region_data,
+  ancillary_dir,
+  creedenzymatic_figure_dir,
+  creedenzymatic_results_dir,
+  pooled_pairwise_data,
+  reverse_krsa_figure_dir,
+  kaleidoscope_data_dir,
+  rats_data,
+  selected_peptide_data_dir,
+  recombinant_peptide_figure_dir
+)
 
 all_dirs |>
   walk(create_dir)
