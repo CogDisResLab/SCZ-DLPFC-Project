@@ -18,8 +18,7 @@ editor_options:
 ---
 ```{r libraries&functions, include=FALSE}
  #loading Libraries ----
-#install.packages("devtools")
-devtools::install_github("kalganem/KRSA")
+devtools::install_github("CogDisResLab/KRSA", "v1.0.0")
 library(tidyverse)
 library(KRSA)
 library(gt)
