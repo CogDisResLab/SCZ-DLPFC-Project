@@ -1,4 +1,4 @@
-# Significant Peptide Selection by PCA
+# Significant Peptide Selection by PLSDA
 
 library(mixOmics)
 library(KRSA)
@@ -46,7 +46,8 @@ output <- list(run1_files, run2_files, run3_files, run4_files) |>
 all_data <- output |>
   purrr::map( ~ pluck(.x, "normalized")) |>
   purrr::imap_dfr( ~ mutate(.x, Run = .y)) |>
-  filter(str_detect(SampleName, "^#REF.*", negate = TRUE))
+  filter(str_detect(Peptide, "^#REF.*", negate = TRUE))
+
 
 
 heatmap_data <- all_data |>
@@ -64,36 +65,42 @@ heatmap_annotation <- all_data |>
 
 batched <- ComBat(heatmap_data, batch = heatmap_annotation$Run)
 
-batch_corrected <- batched[str_detect(rownames(batched), "^#REF.*", negate = TRUE),]
+batch_corrected <- batched |>
+  t()
 
-pca <- prcomp(t(batch_corrected), scale = TRUE)
+grouping <- heatmap_annotation$Group |> as.factor()
 
-pca.data <- data.frame(
-  Sample = rownames(pca$x),
-  X = pca$x[, 1],
-  Y = pca$x[, 2],
-  Run = factor(heatmap_annotation[rownames(pca$x), ]$Run),
-  Group = heatmap_annotation[rownames(pca$x), ]$Group
-)
-pca.data
+## Select Parameters for optimal PLS-DA
 
-## make a scree plot
-pca.var <- pca$sdev^2
-pca.var.per <- round(pca.var/sum(pca.var)*100, 1)
+### Select n of components
 
-g <-
-  ggplot(data = pca.data, aes(
-    x = X,
-    y = Y,
-    color = Run,
-    shape = Group
-  ))
+comparative_plsda <- splsda(batch_corrected, grouping, ncomp = 15)
 
-p <- g + geom_point() +
-  xlab(paste("PC1 - ", pca.var.per[1], "%", sep = "")) +
-  ylab(paste("PC2 - ", pca.var.per[2], "%", sep = "")) +
-  theme_bw() +
-  ggtitle("Batch-Corrected PCA of DLPFC SCZ Samples") +
-  theme(legend.position = "bottom")
+perf_comparative_plsda <- perf(comparative_plsda, validation = "Mfold", folds = 5,
+                              progressBar = TRUE, nrepeat = 50)
 
-ggsave("figures/PCA-Classification-Results.png", plot = p, width = 10, height = 10, units = "in")
+list.keepX <- c(5:10,  seq(20, 100, 10))
+list.keepX
+
+tune_plsda <- tune.splsda(batch_corrected, grouping, ncomp = 5, validation = 'Mfold',
+                          folds = 5, dist = 'max.dist', progressBar = TRUE,
+                          measure = "BER", test.keepX = list.keepX,
+                          nrepeat = 50)
+
+error <- tune_plsda$error.rate
+ncomp <- tune_plsda$choice.ncomp$ncomp
+
+select_keepX <- tune_plsda$choice.keepX[1:ncomp]
+
+
+plsda_result <- splsda(batch_corrected, grouping, ncomp = ncomp, keepX = select_keepX)
+
+background <- background.predict(plsda_result, comp.predicted = ncomp)
+
+plotIndiv(plsda_result, comp = 1:ncomp, group = grouping, ind.names = FALSE, legend = TRUE, background = background, ellipse = TRUE)
+
+
+selected_peptides_1 <- rownames(selectVar(plsda_result, comp = 1)$value)
+selected_peptides_2 <- rownames(selectVar(plsda_result, comp = 2)$value)
+
+all_peptides <- union(selected_peptides_1, selected_peptides_2)
