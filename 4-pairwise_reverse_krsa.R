@@ -114,7 +114,8 @@ hits <-
   c(
     "P38",
     "ERK",
-    "JNK"
+    "JNK",
+    "PIM"
   )
 
 group_diffs <- samples_ids |>
