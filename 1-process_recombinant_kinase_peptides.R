@@ -19,7 +19,7 @@ process_top_peptides <- function(file) {
     str_remove("_top")
   dataset <- read_csv(file) |>
     filter_top_hits() |>
-    select(-any_of(c("...1", "Threshold", "LFC Threshold", "Cluster", "Type", "ID", "Gene"))) |>
+    select(-any_of(c("...1", "Threshold", "LFC Threshold", "Cluster", "Type", "ID", "Gene", "Group"))) |>
     mutate(Source = gene_name)
 
   dataset
