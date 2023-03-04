@@ -9,9 +9,13 @@ kinases <- str_extract(files, "\\w+_filtered") |>
   str_remove("_filtered") |>
   set_names()
 
+sample_metadata <- read_csv("annotation/sample_matching.csv") |>
+  select(Pair = Designation, Gender)
+
 peptide_data <- files |>
   set_names(kinases) |>
-  map(~ read_csv(.x))
+  map(~ read_csv(.x, show_col_types = FALSE)) |>
+  map(~ inner_join(.x, sample_metadata, by = "Pair"))
 
 generate_heatmap <- function(dataset) {
   g <-
@@ -33,22 +37,39 @@ generate_heatmap <- function(dataset) {
 }
 
 comparative_reverse_krsa <- function(dataset, kinase) {
-  g <- ggplot(dataset, aes(x = Pair, y = Score))
+  g <- ggplot(dataset, aes(x = Pair, y = Score, fill = Gender))
+
+  pair_order <-
+    dataset |> select(Pair, Gender) |> unique() |> arrange(desc(Gender)) |> pull(Pair)
 
   p <- g +
-    geom_boxplot() +
-    geom_jitter(width = 0.2, height = 0.2) +
+    geom_boxplot(key_glyph = "rect") +
+    geom_jitter(width = 0.2,
+                height = 0.2,
+                show.legend = FALSE) +
     theme_minimal() +
-    ggtitle(str_glue("Comparison of datasets for {kinase} family"),
-            str_glue("High Affinity Recombinant Peptides")) +
+    ggtitle(
+      str_glue("Comparison of datasets for {kinase} family"),
+      str_glue("High Affinity Recombinant Peptides")
+    ) +
     scale_y_continuous(
       name = "Log_2 Fold Change",
-      limits = c(-2.5, 2.5),
+      limits = c(-2.0, 2.0),
       breaks = seq(-2.5, 2.5, 0.5)
     ) +
-    scale_x_discrete(name = "Dataset") +
-    theme(plot.title = element_text(hjust = 0.5),
-          plot.subtitle = element_text(hjust = 0.5))
+    scale_x_discrete(name = "Dataset", limits = pair_order) +
+    scale_fill_manual(
+      breaks = c("M", "F"),
+      labels = c("Male", "Female"),
+      values = c("darkred", "darkgreen")
+    ) +
+    theme(
+      plot.title = element_text(hjust = 0.5),
+      plot.subtitle = element_text(hjust = 0.5),
+      legend.position = "bottom",
+      legend.direction = "horizontal"
+    ) +
+    guides(fill = guide_legend())
 
 
   p
