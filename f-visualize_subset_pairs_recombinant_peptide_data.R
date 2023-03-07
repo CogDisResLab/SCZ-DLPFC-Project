@@ -9,7 +9,7 @@ kinases <- str_extract(files, "\\w+_filtered") |>
   str_remove("_filtered") |>
   set_names()
 
-selected_samples <- c("R1C2P3", "R3C3P5", "R4C1P2", "R1C1P1", "R3C1P1", "R2C2P3")
+selected_samples <- c("R1C2P3", "R3C3P5", "R4C1P2", "R1C1P2", "R3C1P1", "R2C2P3")
 
 sample_metadata <- read_csv("annotation/sample_matching.csv") |>
   select(Pair = Designation, Gender) |>
