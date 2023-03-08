@@ -5,7 +5,7 @@ library(tidyverse)
 library(KRSA)
 
 metadata <- read_csv("annotation/sample_matching.csv") |>
-  select(Designation, CTL, SCZ) |>
+  select(Designation, CTL, SCZ, Gender) |>
   pivot_longer(cols = c(SCZ, CTL), values_to = "SampleName") |>
   select(-name)
 
