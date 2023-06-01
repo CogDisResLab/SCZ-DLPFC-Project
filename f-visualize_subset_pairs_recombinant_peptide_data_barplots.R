@@ -1,4 +1,4 @@
-# Visualize the peptide-level data for specific pairs
+# Visualize the peptide-level data for specific pairs as barplots
 
 library(tidyverse)
 
@@ -23,14 +23,8 @@ peptide_data <- files |>
 comparative_reverse_krsa <- function(dataset, kinase) {
   g <- ggplot(dataset, aes(x = Pair, y = Score, fill = Gender))
 
-  pair_order <-
-    dataset |> select(Pair, Gender) |> unique() |> arrange(desc(Gender)) |> pull(Pair)
-
   p <- g +
-    geom_boxplot(key_glyph = "rect") +
-    geom_jitter(width = 0.2,
-                height = 0.2,
-                show.legend = FALSE) +
+    geom_bar(key_glyph = "rect", stat = "summary", fun = "mean") +
     theme_minimal() +
     ggtitle(
       str_glue("Comparison of datasets for {kinase} family"),
@@ -38,10 +32,9 @@ comparative_reverse_krsa <- function(dataset, kinase) {
     ) +
     scale_y_continuous(
       name = "Log_2 Fold Change",
-      limits = c(-2.0, 2.0),
-      breaks = seq(-2.5, 2.5, 0.5)
+      limits = c(-0.25, 0.75),
+      breaks = seq(-2.5, 2.5, 0.25)
     ) +
-    scale_x_discrete(name = "Dataset", limits = pair_order) +
     scale_fill_manual(
       breaks = c("M", "F"),
       labels = c("Male", "Female"),
@@ -51,9 +44,12 @@ comparative_reverse_krsa <- function(dataset, kinase) {
       plot.title = element_text(hjust = 0.5),
       plot.subtitle = element_text(hjust = 0.5),
       legend.position = "bottom",
-      legend.direction = "horizontal"
+      legend.direction = "horizontal",
+      strip.background = element_rect(fill = "grey80"),
+      panel.background = element_rect(fill = NA, color = "black", linewidth = 1)
     ) +
-    guides(fill = guide_legend())
+    guides(fill = guide_legend()) +
+    facet_grid(~ Gender, scales = "free", space = "free", labeller = labeller(Gender = c("F" = "Female", "M" = "Male")))
 
 
   p
@@ -63,7 +59,7 @@ peptide_data |>
   imap(~ comparative_reverse_krsa(.x, .y)) |>
   imap(
     ~ ggsave(
-      filename = str_glue("{.y}_subset_recombinant_peptide_activity_boxplot.png"),
+      filename = str_glue("{.y}_subset_recombinant_peptide_activity_barplot.png"),
       plot = .x,
       path = "figures/recombinant_peptide",
       width = 12,
