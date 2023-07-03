@@ -1,6 +1,7 @@
 # Visualize the peptide-level data for specific pairs as barplots
 
 library(tidyverse)
+library(ggprism)
 
 files <-
   list.files(pattern = "*filtered_peptides_data.csv", recursive = TRUE)
@@ -9,7 +10,15 @@ kinases <- str_extract(files, "\\w+_filtered") |>
   str_remove("_filtered") |>
   set_names()
 
-selected_samples <- c("R1C2P3", "R2C2P4", "R3C3P5", "R4C1P2", "R1C1P2", "R2C2P3", "R3C1P1", "R3C2P3")
+selected_samples <-
+  c("R1C2P3",
+    "R2C2P4",
+    "R3C3P5",
+    "R4C1P2",
+    "R1C1P2",
+    "R2C2P3",
+    "R3C1P1",
+    "R3C2P3")
 
 sample_metadata <- read_csv("annotation/sample_matching.csv") |>
   select(Pair = Designation, Gender) |>
@@ -17,46 +26,67 @@ sample_metadata <- read_csv("annotation/sample_matching.csv") |>
 
 peptide_data <- files |>
   set_names(kinases) |>
-  map(~ read_csv(.x, show_col_types = FALSE)) |>
-  map(~ inner_join(.x, sample_metadata, by = "Pair"))
+  map( ~ read_csv(.x, show_col_types = FALSE)) |>
+  map( ~ inner_join(.x, sample_metadata, by = "Pair"))
 
 comparative_reverse_krsa <- function(dataset, kinase) {
-  g <- ggplot(dataset, aes(x = Pair, y = Score, fill = Gender))
+  summarised_data <- dataset |>
+    group_by(Pair, Gender) |>
+    summarise(
+      Mean = mean(Score, na.rm = TRUE),
+      SD = sd(Score, na.rm = TRUE),
+      N = n(),
+      SEM = SD / N,
+      .groups = "drop"
+    ) |>
+    mutate(YMAX = if_else(Mean > 0, Mean + SEM, Mean - SEM))
+
+  sample_order <- summarised_data |>
+    ungroup() |>
+    arrange(Gender, Pair) |>
+    mutate(
+      PairNum = row_number(),
+      PairLabel = str_glue("Pair{str_pad(PairNum, width=2, pad = 0)}")
+    ) |>
+    select(PairLabel, Pair) |>
+    deframe()
+
+  g <- ggplot(summarised_data,
+              aes(x = Pair, y = Mean, fill = Gender))
 
   p <- g +
-    geom_bar(key_glyph = "rect", stat = "summary", fun = "mean") +
-    theme_minimal() +
-    ggtitle(
-      str_glue("Comparison of datasets for {kinase} family"),
-      str_glue("High Affinity Recombinant Peptides")
-    ) +
+    geom_errorbar(aes(x = Pair,
+                      ymin = YMAX,
+                      ymax = YMAX),
+                  width = 0.5,
+                  position = "dodge",
+                  show.legend = FALSE) +
+    geom_linerange(aes(x = Pair,
+                       ymin = Mean,
+                       ymax = YMAX),
+                   show.legend = FALSE) +
+    geom_bar(key_glyph = "rect", stat = "identity", show.legend = FALSE) +
+    theme_prism() +
+    scale_fill_prism(palette = "black_and_white") +
+    scale_x_discrete(limits = sample_order, labels = names(sample_order)) +
     scale_y_continuous(
-      name = "Log_2 Fold Change",
-      limits = c(-0.25, 0.75),
+      name = expression(Log[2]~Fold~change),
+      limits = c(-0.25, 1.25),
       breaks = seq(-2.5, 2.5, 0.25)
     ) +
-    scale_fill_manual(
-      breaks = c("M", "F"),
-      labels = c("Male", "Female"),
-      values = c("darkred", "darkgreen")
-    ) +
-    theme(
-      plot.title = element_text(hjust = 0.5),
-      plot.subtitle = element_text(hjust = 0.5),
-      legend.position = "bottom",
-      legend.direction = "horizontal",
-      strip.background = element_rect(fill = "grey80"),
-      panel.background = element_rect(fill = NA, color = "black", linewidth = 1)
-    ) +
-    guides(fill = guide_legend()) +
-    facet_grid(~ Gender, scales = "free", space = "free", labeller = labeller(Gender = c("F" = "Female", "M" = "Male")))
+    geom_segment(x = 0.75, y = 1.25, xend = 4.25, yend = 1.25, linewidth = 1.25) +
+    geom_segment(x = 4.75, y = 1.25, xend = 8.25, yend = 1.25, linewidth = 1.25) +
+    geom_text(x = 2.5, y = 1.3, label = "Female", size = 8) +
+    geom_text(x = 6.5, y = 1.3, label = "Male", size = 8) +
+    xlab("") +
+    theme(axis.title.y = element_text(face = "bold"))
 
 
   p
 }
 
 peptide_data |>
-  imap(~ comparative_reverse_krsa(.x, .y)) |>
+  imap( ~ comparative_reverse_krsa(.x, .y)) |>
   imap(
     ~ ggsave(
       filename = str_glue("{.y}_subset_recombinant_peptide_activity_barplot.png"),
@@ -68,3 +98,4 @@ peptide_data |>
       bg = "white"
     )
   )
+
