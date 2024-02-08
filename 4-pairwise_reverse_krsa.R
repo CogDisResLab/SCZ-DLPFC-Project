@@ -195,3 +195,20 @@ hits |>
       dpi = 300
     )
   )
+
+hits |>
+  map( ~ comparative_reverse_krsa(.x, combined_data)) |>
+  walk(
+    ~ ggsave(
+      str_glue(
+        "{unique(.x$data$Kinase)}_reverse_krsa_comparison.svg"
+      ),
+      plot = .x,
+      bg = "white",
+      path = file.path("figures", "reverse_krsa"),
+      width = 10,
+      height = 8,
+      units = "in",
+      dpi = 300
+    )
+  )
