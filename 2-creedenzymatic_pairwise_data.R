@@ -47,6 +47,17 @@ process_KEA3 <- function(file) {
   df
 }
 
+process_PTM.SEA <- function(file) {
+  col_spec <- cols(
+    Peptide = col_character(),
+    Score = col_double()
+  )
+
+  df <- read_delim(file, delim = " ", col_types = col_spec) %>%
+    read_ptmsea()
+  df
+}
+
 extract_sig_kinases <- function(df) {
   out <-
     df %>%
@@ -56,10 +67,11 @@ extract_sig_kinases <- function(df) {
     pivot_wider(
       names_from = Method,
       values_from = xx,
-      values_fill = 0
+      values_fill = 0,
+      values_fn = unique
     ) %>%
-    mutate(total = KEA3 + KRSA + UKA) %>%
-    filter(total >= 2,
+    mutate(total = KEA3 + KRSA + UKA + `PTM-SEA`) %>%
+    filter(total >= 3,
            !is.na(hgnc_symbol))
 
   out
@@ -79,7 +91,11 @@ kea3_data <- list.files("data/KEA3_Reports/", full.names = TRUE) %>%
   map(process_KEA3) %>%
   set_names(list.files("data/KEA3_Reports/") %>% str_extract("R\\dC\\dP\\d"))
 
-all_data <- list(krsa_data, uka_data, kea3_data)
+ptm_sea_data <- list.files("data/KEA3_Reports/", full.names = TRUE) %>%
+  map(process_PTM.SEA) %>%
+  set_names(list.files("data/KEA3_Reports/") %>% str_extract("R\\dC\\dP\\d"))
+
+all_data <- list(krsa_data, uka_data, kea3_data, ptm_sea_data)
 
 common <- all_data %>%
   map(names) %>%
@@ -87,8 +103,8 @@ common <- all_data %>%
 
 processed_data <- all_data %>%
   map(~ magrittr::extract(.x, common)) %>%
-  set_names(c("KRSA", "UKA", "KEA3")) %>%
-  pmap(~ combine_tools(KRSA_df = ..1, UKA_df = ..2, KEA3_df = ..3)) |>
+  set_names(c("KRSA", "UKA", "KEA3", "PTM-SEA")) %>%
+  pmap(~ combine_tools(KRSA_df = ..1, UKA_df = ..2, KEA3_df = ..3, PTM_SEA_df = ..4)) |>
   map2(common, ~ write_csv(.x, file.path("results", "creedenzymatic", str_glue("{.y}_creedenzymatic_results.csv"))))
 
 sig_kinases <- processed_data %>%
@@ -100,3 +116,9 @@ final_figures <- processed_data %>%
   map2(sig_kinases, ~ filter(.x, hgnc_symbol %in% {{.y}})) %>%
   map(quartile_figure) %>%
   map2(names(.), ~ ggsave(str_glue("{.y}_Quartile_Figure.png"), plot = .x, path = file.path("figures", "creedenzymatic"), width = 16, height = 8, units = "in"))
+
+
+processed_data$R1C1P1 %>%
+  filter(hgnc_symbol %in% c(sig_kinases$R1C1P1, "DMPK", "SGK2")) |>
+  quartile_figure() |>
+  ggsave("PamGene_Quartile_Figure.png", plot = _, path = file.path("figures", "creedenzymatic"), width = 12, height = 3, units = "in")

@@ -99,3 +99,29 @@ peptide_data |>
     )
   )
 
+peptide_data |>
+  imap( ~ comparative_reverse_krsa(.x, .y)) |>
+  imap(
+    ~ ggsave(
+      filename = str_glue("{.y}_subset_recombinant_peptide_activity_barplot.pdf"),
+      plot = .x,
+      path = "figures/recombinant_peptide",
+      width = 12,
+      height = 8,
+      units = "in",
+    )
+  )
+
+peptide_data |>
+  imap( ~ comparative_reverse_krsa(.x, .y)) |>
+  imap(
+    ~ ggsave(
+      filename = str_glue("{.y}_subset_recombinant_peptide_activity_barplot.svg"),
+      plot = .x,
+      path = "figures/recombinant_peptide",
+      width = 12,
+      height = 8,
+      units = "in",
+    )
+  )
+
