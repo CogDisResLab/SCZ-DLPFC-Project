@@ -4,3 +4,9 @@
 .Ruserdata
 *.xlsx
 *.zip
+*.log
+x-*.R
+*.pdf
+*.log
+*.html
+*.png
