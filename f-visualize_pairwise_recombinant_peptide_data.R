@@ -1,6 +1,7 @@
 # Visualize the peptide-level data
 
 library(tidyverse)
+library(ggpubr)
 
 files <-
   list.files(pattern = "*filtered_peptides_data.csv", recursive = TRUE)
@@ -75,6 +76,19 @@ comparative_reverse_krsa <- function(dataset, kinase) {
   p
 }
 
+comparative_reverse_krsa_publication <- function(dataset, kinase) {
+
+  pair_order <-
+    dataset |> select(Pair, Gender) |> unique() |> arrange(desc(Gender)) |> pull(Pair)
+
+  p <- ggboxplot(dataset, "Pair", "Score", facet.by = "Gender",
+   order = pair_order, panel.labs = list(Gender = c("Female", "Male")),
+    scales = "free_x", palette = "npg", bxp.errorbar = TRUE) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+  p
+}
+
 peptide_data |>
   map(generate_heatmap) |>
   map2(
@@ -99,6 +113,20 @@ peptide_data |>
       path = "figures/recombinant_peptide",
       width = 12,
       height = 8,
+      units = "in",
+      bg = "white"
+    )
+  )
+
+peptide_data |>
+  imap(~ comparative_reverse_krsa_publication(.x, .y)) |>
+  imap(
+    ~ ggsave(
+      filename = str_glue("{.y}_recombinant_peptide_activity_boxplot_publication.png"),
+      plot = .x,
+      path = "figures/recombinant_peptide",
+      width = 11,
+      height = 8.5,
       units = "in",
       bg = "white"
     )
