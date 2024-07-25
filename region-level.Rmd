@@ -1,6 +1,6 @@
 ---
-title: "Add Title Here"
-subtitle: "Customer Name Here"
+title: "Human DLPFC Kinome Profiling - Region Level"
+subtitle: "Drs. Ali Imami and Robert McCullumsmith"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 author: "Cognitive Disorders Research Lab"
 format: 
@@ -16,8 +16,8 @@ editor: source
 toc: true
 params:
   chip_type: "STK" # Change the Chip Type to PTK if needed
-  signal_file: "kinome_data/SignalMinusBackground.txt" # Change the file name to the one you have
-  saturation_file: "kinome_data/SignalSaturation.txt" # Change the file name to the one you have
+  signal_file: "kinome_data/region-level/region_KRSA_files_Median_SigmBg_210807100633.txt" # Change the file name to the one you have
+  saturation_file: "kinome_data/region-level/region_KRSA_files_Signal_Saturation_210807100633.txt" # Change the file name to the one you have
   threshold: 2 # Change the threshold if necessary
 ---
 
@@ -41,7 +41,7 @@ knitr::opts_chunk$set( # nolint: extraction_operator_linter.
 )
 
 
-run_prefix <- "krsa"
+run_prefix <- "region-level"
 ```
 
 # Introduction
@@ -116,11 +116,27 @@ We will perform a couple of quality control steps to deal with negative values i
 #| label: "quality-control"
 
 # qc processing
-qc_data <- krsa_qc_steps(raw_data) |>
+qc_data_separate <- krsa_qc_steps(raw_data) |>
   mutate(
-    Group = SampleName,
+    Group = case_when(
+      SampleName == "Female CT" ~ "F_CTL",
+      SampleName == "Male CT" ~ "M_CTL",
+      SampleName == "Female SCHZ" ~ "F_SCZ",
+      SampleName == "Male SCHZ" ~ "M_SCZ"
+    ),
     SampleName = paste0(Group, "_", Barcode)
   )
+
+qc_data_pooled <- qc_data_separate |>
+  mutate(
+    Group = case_when(
+      Group %in% c("F_CTL", "M_CTL") ~ "CTL",
+      Group %in% c("F_SCZ", "M_SCZ") ~ "SCZ"
+    ),
+    SampleName = str_c(SampleName, Group, sep = "_")
+  )
+
+qc_data <- bind_rows(qc_data_separate, qc_data_pooled)
 
 groups <- unique(qc_data[["Group"]])
 
@@ -249,10 +265,9 @@ These *Filtering Parameters* (fold change threshold, QC criteria) can be modifie
 
 # Define Groups to be compared
 comparisons <- list(
-  COMP1 = c(groups[[1L]], groups[[4L]]),
-  COMP2 = c(groups[[1L]], groups[[3L]]),
-  COMP3 = c(groups[[2L]], groups[[4L]]),
-  COMP4 = c(groups[[4L]], groups[[3L]])
+  COMP1 = c(groups[[2L]], groups[[1L]]),
+  COMP2 = c(groups[[4L]], groups[[3L]]),
+  COMP3 = c(groups[[6L]], groups[[5L]])
 )
 ```
 
@@ -281,6 +296,55 @@ res <- knitr::knit_child(text = src, quiet = TRUE)
 cat(res, sep = "\n")
 ```
 
+```{r}
+#| results: "asis"
+#| echo: FALSE
+#| include: TRUE
+#| label: "childB"
+#| fig-width: 6
+#| fig-height: 6
+#| fig-cap: "Heatmap of pairwise group comparison"
+
+case <- comparisons[["COMP2"]][[1L]]
+ctrl <- comparisons[["COMP2"]][[2L]]
+random <- "B"
+threshold <- params[["threshold"]]
+
+src <- knitr::knit_expand(
+  file = "_comparison.Rmd",
+  case = case, ctrl = ctrl, threshold = threshold,
+  chip = params[["chip_type"]]
+)
+
+res <- knitr::knit_child(text = src, quiet = TRUE)
+
+cat(res, sep = "\n")
+```
+
+```{r}
+#| results: "asis"
+#| echo: FALSE
+#| include: TRUE
+#| label: "childC"
+#| fig-width: 6
+#| fig-height: 6
+#| fig-cap: "Heatmap of pairwise group comparison"
+
+case <- comparisons[["COMP3"]][[1L]]
+ctrl <- comparisons[["COMP3"]][[2L]]
+random <- "C"
+threshold <- params[["threshold"]]
+
+src <- knitr::knit_expand(
+  file = "_comparison.Rmd",
+  case = case, ctrl = ctrl, threshold = threshold,
+  chip = params[["chip_type"]]
+)
+
+res <- knitr::knit_child(text = src, quiet = TRUE)
+
+cat(res, sep = "\n")
+```
 
 # Session Info
 
