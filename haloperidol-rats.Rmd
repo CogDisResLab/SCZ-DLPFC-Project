@@ -1,6 +1,6 @@
 ---
-title: "Add Title Here"
-subtitle: "Customer Name Here"
+title: "Rat Prefrontal Cortex Kinome Profiling - Haloperidol Treatment"
+subtitle: "Drs. Ali Imami and Robert McCullumsmith"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 author: "Cognitive Disorders Research Lab"
 format: 
@@ -16,8 +16,8 @@ editor: source
 toc: true
 params:
   chip_type: "STK" # Change the Chip Type to PTK if needed
-  signal_file: "kinome_data/SignalMinusBackground.txt" # Change the file name to the one you have
-  saturation_file: "kinome_data/SignalSaturation.txt" # Change the file name to the one you have
+  signal_file: "kinome_data/haloperidol-rats/rats-haloperidol_SigmBg.txt" # Change the file name to the one you have
+  saturation_file: "kinome_data/haloperidol-rats/rats-haloperidol_Saturation.txt" # Change the file name to the one you have
   threshold: 2 # Change the threshold if necessary
 ---
 
@@ -41,7 +41,7 @@ knitr::opts_chunk$set( # nolint: extraction_operator_linter.
 )
 
 
-run_prefix <- "krsa"
+run_prefix <- "haloperidol-rats"
 ```
 
 # Introduction
@@ -105,7 +105,8 @@ chipType <- params[["chip_type"]]
 raw_data <- krsa_read(
   signal_file = params[["signal_file"]],
   signal_saturation = params[["saturation_file"]]
-)
+) |>
+  filter(Barcode == "701032204", SampleName == "Brain")
 ```
 
 ## QC Initial Steps and Groups Assignments
@@ -118,7 +119,7 @@ We will perform a couple of quality control steps to deal with negative values i
 # qc processing
 qc_data <- krsa_qc_steps(raw_data) |>
   mutate(
-    Group = SampleName,
+    Group = if_else(`Comment 1` == "CT", "Control", "Haloperidol"),
     SampleName = paste0(Group, "_", Barcode)
   )
 
@@ -168,6 +169,7 @@ We will plot the coefficient of variation on both the normal and normalized fits
 #| fig-width: 6
 #| fig-height: 6
 #| fig-cap: "Coefficient of Variation plotted for each peptide across all 4 groups"
+#| eval: false
 
 # Plot a CV figure using the modeled normalized data
 krsa_cv_plot(data_modeled[["normalized"]], clean_peptides)
@@ -249,10 +251,7 @@ These *Filtering Parameters* (fold change threshold, QC criteria) can be modifie
 
 # Define Groups to be compared
 comparisons <- list(
-  COMP1 = c(groups[[1L]], groups[[4L]]),
-  COMP2 = c(groups[[1L]], groups[[3L]]),
-  COMP3 = c(groups[[2L]], groups[[4L]]),
-  COMP4 = c(groups[[4L]], groups[[3L]])
+  COMP1 = c(groups[[2L]], groups[[1L]])
 )
 ```
 
