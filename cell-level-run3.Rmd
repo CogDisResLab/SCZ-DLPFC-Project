@@ -1,6 +1,6 @@
 ---
-title: "Add Title Here"
-subtitle: "Customer Name Here"
+title: "Human DLPFC Kinome Profiling - Cell Level"
+subtitle: "Drs. Ali Imami and Robert McCullumsmith"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 author: "Cognitive Disorders Research Lab"
 format: 
@@ -16,8 +16,8 @@ editor: source
 toc: true
 params:
   chip_type: "STK" # Change the Chip Type to PTK if needed
-  signal_file: "kinome_data/SignalMinusBackground.txt" # Change the file name to the one you have
-  saturation_file: "kinome_data/SignalSaturation.txt" # Change the file name to the one you have
+  signal_file: "kinome_data/cell-level/run3_KRSA_files_Median_SigmBg_210519103637.txt" # Change the file name to the one you have
+  saturation_file: "kinome_data/cell-level/run3_KRSA_files_Signal_Saturation_210519103637.txt" # Change the file name to the one you have
   threshold: 2 # Change the threshold if necessary
 ---
 
@@ -40,8 +40,7 @@ knitr::opts_chunk$set( # nolint: extraction_operator_linter.
   warning = FALSE
 )
 
-
-run_prefix <- "krsa"
+run_prefix <- "cell-level-run3"
 ```
 
 # Introduction
@@ -106,6 +105,10 @@ raw_data <- krsa_read(
   signal_file = params[["signal_file"]],
   signal_saturation = params[["saturation_file"]]
 )
+
+# Load the subject pairings
+subject_pairs <- read_csv(file.path("kinome_data", "subject_pairs.csv")) |>
+  filter(Run == 3L)
 ```
 
 ## QC Initial Steps and Groups Assignments
@@ -168,6 +171,7 @@ We will plot the coefficient of variation on both the normal and normalized fits
 #| fig-width: 6
 #| fig-height: 6
 #| fig-cap: "Coefficient of Variation plotted for each peptide across all 4 groups"
+#| eval: false
 
 # Plot a CV figure using the modeled normalized data
 krsa_cv_plot(data_modeled[["normalized"]], clean_peptides)
@@ -249,10 +253,12 @@ These *Filtering Parameters* (fold change threshold, QC criteria) can be modifie
 
 # Define Groups to be compared
 comparisons <- list(
-  COMP1 = c(groups[[1L]], groups[[4L]]),
-  COMP2 = c(groups[[1L]], groups[[3L]]),
-  COMP3 = c(groups[[2L]], groups[[4L]]),
-  COMP4 = c(groups[[4L]], groups[[3L]])
+  COMP1 = c(subject_pairs[["SCZ"]][[1L]], subject_pairs[["CTL"]][[1L]]),
+  COMP2 = c(subject_pairs[["SCZ"]][[2L]], subject_pairs[["CTL"]][[2L]]),
+  COMP3 = c(subject_pairs[["SCZ"]][[3L]], subject_pairs[["CTL"]][[3L]]),
+  COMP4 = c(subject_pairs[["SCZ"]][[4L]], subject_pairs[["CTL"]][[4L]]),
+  COMP5 = c(subject_pairs[["SCZ"]][[5L]], subject_pairs[["CTL"]][[5L]]),
+  COMP6 = c(subject_pairs[["SCZ"]][[6L]], subject_pairs[["CTL"]][[6L]])
 )
 ```
 
@@ -268,6 +274,131 @@ comparisons <- list(
 case <- comparisons[["COMP1"]][[1L]]
 ctrl <- comparisons[["COMP1"]][[2L]]
 random <- "A"
+threshold <- params[["threshold"]]
+
+src <- knitr::knit_expand(
+  file = "_comparison.Rmd",
+  case = case, ctrl = ctrl, threshold = threshold,
+  chip = params[["chip_type"]]
+)
+
+res <- knitr::knit_child(text = src, quiet = TRUE)
+
+cat(res, sep = "\n")
+```
+
+```{r}
+#| results: "asis"
+#| echo: FALSE
+#| include: TRUE
+#| label: "childB"
+#| fig-width: 6
+#| fig-height: 6
+#| fig-cap: "Heatmap of pairwise group comparison"
+
+case <- comparisons[["COMP2"]][[1L]]
+ctrl <- comparisons[["COMP2"]][[2L]]
+random <- "B"
+threshold <- params[["threshold"]]
+
+src <- knitr::knit_expand(
+  file = "_comparison.Rmd",
+  case = case, ctrl = ctrl, threshold = threshold,
+  chip = params[["chip_type"]]
+)
+
+res <- knitr::knit_child(text = src, quiet = TRUE)
+
+cat(res, sep = "\n")
+```
+
+```{r}
+#| results: "asis"
+#| echo: FALSE
+#| include: TRUE
+#| label: "childC"
+#| fig-width: 6
+#| fig-height: 6
+#| fig-cap: "Heatmap of pairwise group comparison"
+
+case <- comparisons[["COMP3"]][[1L]]
+ctrl <- comparisons[["COMP3"]][[2L]]
+random <- "C"
+threshold <- params[["threshold"]]
+
+src <- knitr::knit_expand(
+  file = "_comparison.Rmd",
+  case = case, ctrl = ctrl, threshold = threshold,
+  chip = params[["chip_type"]]
+)
+
+res <- knitr::knit_child(text = src, quiet = TRUE)
+
+cat(res, sep = "\n")
+```
+
+```{r}
+#| results: "asis"
+#| echo: FALSE
+#| include: TRUE
+#| label: "childD"
+#| fig-width: 6
+#| fig-height: 6
+#| fig-cap: "Heatmap of pairwise group comparison"
+
+case <- comparisons[["COMP4"]][[1L]]
+ctrl <- comparisons[["COMP4"]][[2L]]
+random <- "D"
+threshold <- params[["threshold"]]
+
+src <- knitr::knit_expand(
+  file = "_comparison.Rmd",
+  case = case, ctrl = ctrl, threshold = threshold,
+  chip = params[["chip_type"]]
+)
+
+res <- knitr::knit_child(text = src, quiet = TRUE)
+
+cat(res, sep = "\n")
+```
+
+```{r}
+#| results: "asis"
+#| echo: FALSE
+#| include: TRUE
+#| label: "childE"
+#| fig-width: 6
+#| fig-height: 6
+#| fig-cap: "Heatmap of pairwise group comparison"
+
+case <- comparisons[["COMP5"]][[1L]]
+ctrl <- comparisons[["COMP5"]][[2L]]
+random <- "E"
+threshold <- params[["threshold"]]
+
+src <- knitr::knit_expand(
+  file = "_comparison.Rmd",
+  case = case, ctrl = ctrl, threshold = threshold,
+  chip = params[["chip_type"]]
+)
+
+res <- knitr::knit_child(text = src, quiet = TRUE)
+
+cat(res, sep = "\n")
+```
+
+```{r}
+#| results: "asis"
+#| echo: FALSE
+#| include: TRUE
+#| label: "childF"
+#| fig-width: 6
+#| fig-height: 6
+#| fig-cap: "Heatmap of pairwise group comparison"
+
+case <- comparisons[["COMP6"]][[1L]]
+ctrl <- comparisons[["COMP6"]][[2L]]
+random <- "F"
 threshold <- params[["threshold"]]
 
 src <- knitr::knit_expand(
