@@ -42,6 +42,10 @@ scaled_signal <- signal_data_wide |>
   left_join(comparison_annotation, by = "Group") |>
   write_csv(file.path("results", "scaled_signal.csv"))
 
+scale_limits <- c(
+  floor(min(scaled_signal[["ScaledValue"]])),
+  ceiling(max(scaled_signal[["ScaledValue"]]))
+)
 
 heatmaps <- scaled_signal |>
   nest(.by = Comparison) |>
@@ -65,7 +69,13 @@ heatmaps <- scaled_signal |>
         show_cluster_rows = FALSE,
         text_show_rows = FALSE,
         scale = "none"
-      )
+      ) +
+        scale_x_discrete(labels = \(x) str_extract(x, "SCZ|CTL")) +
+        scale_fill_gradientn(
+          colours = hcl.colors(100L, "Red-Green"),
+          limits = scale_limits
+        ) +
+        guides(fill = "none")
     )
   ) |>
   select(Comparison, heatmap) |>
@@ -79,8 +89,8 @@ figures_png <- heatmaps |>
       str_glue("{.y}_heatmaps.png")
     ),
     plot = .x,
-    width = 3L,
-    height = 5L,
+    width = 2L,
+    height = 4L,
     path = "figures",
     dpi = 300L,
     bg = "white",
@@ -95,10 +105,10 @@ figures_svg <- heatmaps |>
       str_glue("{.y}_heatmaps.svg")
     ),
     plot = .x,
-    width = 3L,
-    height = 5L,
+    width = 2L,
+    height = 4L,
     path = "figures",
     dpi = 300L,
-    bg = "white",
+    bg = NULL,
     create.dir = TRUE
   ))
