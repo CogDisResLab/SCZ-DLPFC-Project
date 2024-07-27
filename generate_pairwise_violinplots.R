@@ -3,6 +3,7 @@
 # We will scale globally so all heatmaps have the same scale
 
 library(tidyverse)
+library(ggpubr)
 
 signal_files <- list.files("results", "cell.*signal", full.names = TRUE) |>
   discard(~ str_detect(.x, fixed("SCZ_11"))) |>
@@ -19,20 +20,56 @@ col_spec <- cols(
 )
 
 create_violinplot <- function(data) {
-  ggplot(data, aes(x = Group, y = slope, fill = Group)) +
-    geom_violin() +
-    geom_jitter(width = 0.1) +
-    scale_x_discrete(labels = \(x) str_extract(x, "SCZ|CTL")) +
-    scale_fill_discrete(type = hcl.colors(2L, palette = "Harmonic")) +
-    xlab("Phenotype") +
-    ylab("Signal Intensity") +
-    guides(fill = "none") +
-    ggprism::theme_prism()
+  clean_data <- data |>
+    mutate(
+      Group = str_extract(Group, "SCZ|CTL")
+    )
+
+  ggviolin(
+    clean_data,
+    "Group",
+    "slope",
+    xlab = "Phenotype",
+    ylab = "Signal Intensity",
+    fill = "Group",
+    palette = "uchicago",
+    ylim = scale_limits,
+    legend = "none",
+    yticks.by = 2L,
+    add = "boxplot",
+    add.params = list(
+      fill = "white",
+      color = "black"
+    )
+  ) +
+    geom_bracket(
+      aes(
+        label = p.signif,
+        xmin = group1,
+        xmax = group2
+      ),
+      data = compare_means(
+        slope ~ Group,
+        data = clean_data, method = "t.test"
+      ),
+      y.position = max(scale_limits) * 0.95
+    )
 }
 
 signal_data <- signal_files |>
   map(~ read_csv(.x, col_types = col_spec)) |>
   bind_rows(.id = "Comparison")
+
+scale_limits <- c(
+  floor(min(signal_data[["slope"]])),
+  ceiling(max(signal_data[["slope"]]))
+)
+
+breaks <- seq(
+  scale_limits[[1L]],
+  scale_limits[[2L]],
+  length.out = 6L
+)
 
 violinplots <- signal_data |>
   nest(.by = Comparison) |>
