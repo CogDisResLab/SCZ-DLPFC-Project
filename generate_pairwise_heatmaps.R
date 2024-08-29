@@ -4,10 +4,24 @@
 
 library(tidyverse)
 library(ggheatmap)
+library(patchwork)
 
 signal_files <- list.files("results", "cell.*signal", full.names = TRUE) |>
   discard(~ str_detect(.x, fixed("SCZ_11"))) |>
   set_names(~ str_extract(basename(.x), "SCZ_\\d+_CTL_\\d+")) # nolint: nonportable_path_linter.
+
+pair_numbers <- read_csv("kinome_data/subject_pairs.csv") |>
+  select(Pair, SCZ, CTL) |>
+  mutate(
+    CTL = str_replace(CTL, fixed("832"), fixed("834")),
+    ID = str_c(SCZ, CTL, sep = "_")
+  ) |>
+  select(-SCZ, -CTL, ID, Pair) |>
+  filter(!is.na(Pair)) |>
+  select(ID, Pair) |>
+  deframe()
+
+signal_files <- set_names(signal_files, pair_numbers)
 
 col_spec <- cols(
   Group = col_character(),
@@ -59,8 +73,9 @@ heatmaps <- scaled_signal |>
         column_to_rownames("Peptide") |>
         as.matrix()
     ),
-    heatmap = map(
+    heatmap = map2(
       widened,
+      Comparison,
       ~ ggheatmap(.x,
         color = hcl.colors(100L, "Red-Green"),
         legendName = "Activity",
@@ -75,7 +90,9 @@ heatmaps <- scaled_signal |>
           colours = hcl.colors(100L, "Red-Green"),
           limits = scale_limits
         ) +
-        guides(fill = "none")
+        guides(fill = "none") +
+        labs(caption = .y) +
+        theme(plot.caption = element_text(hjust = 0.5))
     )
   ) |>
   select(Comparison, heatmap) |>
@@ -89,8 +106,8 @@ figures_png <- heatmaps |>
       str_glue("{.y}_heatmaps.png")
     ),
     plot = .x,
-    width = 2L,
-    height = 4L,
+    width = 1.25,
+    height = 1.67,
     path = "figures",
     dpi = 300L,
     bg = "white",
@@ -105,10 +122,30 @@ figures_svg <- heatmaps |>
       str_glue("{.y}_heatmaps.svg")
     ),
     plot = .x,
-    width = 2L,
-    height = 4L,
+    width = 1.25,
+    height = 1.67,
     path = "figures",
     dpi = 300L,
     bg = NULL,
     create.dir = TRUE
   ))
+
+combined_plot <- wrap_plots(heatmaps[-c(10L)], nrow = 3L, ncol = 6L) # nolint: unnecessary_concatenation_linter.
+
+ggsave(
+  filename = file.path("figures", "combined_heatmaps.png"),
+  plot = combined_plot,
+  width = 7.5,
+  height = 5L,
+  dpi = 300L,
+  bg = "white"
+)
+
+ggsave(
+  filename = file.path("figures", "combined_heatmaps.svg"),
+  plot = combined_plot,
+  width = 7.5,
+  height = 5L,
+  dpi = 300L,
+  bg = "white"
+)
