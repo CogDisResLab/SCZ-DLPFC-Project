@@ -97,7 +97,7 @@ signal_files <- list.files("results", "dpp", full.names = TRUE) |>
       str_remove(fixed("-dpp")) |>
       str_remove(".csv")
   ) |>
-  keep(~ str_detect(.x, "R\\dC\\dP\\d"))
+  keep(~ str_detect(.x, "R\\dC\\dP\\d|rats"))
 
 signal_names <- names(signal_files)
 

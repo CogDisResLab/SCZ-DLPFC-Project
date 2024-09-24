@@ -96,7 +96,8 @@ signal_files <- list.files("results", "signal", full.names = TRUE) |>
       str_remove(fixed("-signal")) |>
       str_remove(".csv")
   ) |>
-  discard(~ str_detect(.x, "R\\dC\\dP\\d"))
+  discard(~ str_detect(.x, "R\\dC\\dP\\d")) |>
+  discard(~ str_remove(.x, "rats"))
 
 signal_names <- names(signal_files)
 
