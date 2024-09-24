@@ -262,7 +262,7 @@ comparisons <- list(
   COMP2 = c(subject_pairs[["SCZ"]][[2L]], subject_pairs[["CTL"]][[2L]], subject_pairs[["Designation"]][[2L]]),
   COMP3 = c(subject_pairs[["SCZ"]][[3L]], subject_pairs[["CTL"]][[3L]], subject_pairs[["Designation"]][[3L]]),
   COMP4 = c(subject_pairs[["SCZ"]][[4L]], subject_pairs[["CTL"]][[4L]], subject_pairs[["Designation"]][[4L]]),
-  COMP5 = c(subject_pairs[["SCZ"]][[5L]], subject_pairs[["CTL"]][[5L]], subject_pairs[["Designation"]][[5L]])
+  COMP5 = c(subject_pairs[["SCZ"]][[5L]], subject_pairs[["CTL"]][[5L]], subject_pairs[["Designation"]][[5L]]),
   COMP6 = c(subject_pairs[["SCZ"]][[6L]], subject_pairs[["CTL"]][[6L]], subject_pairs[["Designation"]][[6L]])
 )
 ```

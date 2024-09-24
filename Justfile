@@ -1,10 +1,10 @@
 alias a: all
 
 render:
-  quarto render case_control_E1_pairwise.Rmd
-  quarto render case_control_E2_pairwise.Rmd
-  quarto render case_control_E3_pairwise.Rmd
-  quarto render case_control_E4_pairwise.Rmd
+  quarto render cell-level-run1.Rmd
+  quarto render cell-level-run2.Rmd
+  quarto render cell-level-run3.Rmd
+  quarto render cell-level-run4.Rmd
 
 uka:
   Rscript uka_analysis.R

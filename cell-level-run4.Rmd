@@ -257,7 +257,7 @@ These *Filtering Parameters* (fold change threshold, QC criteria) can be modifie
 # Define Groups to be compared
 comparisons <- list(
   COMP1 = c(subject_pairs[["SCZ"]][[1L]], subject_pairs[["CTL"]][[1L]], subject_pairs[["Designation"]][[1L]]),
-  COMP2 = c(subject_pairs[["SCZ"]][[2L]], subject_pairs[["CTL"]][[2L]], subject_pairs[["Designation"]][[2L]]),
+  COMP2 = c(subject_pairs[["SCZ"]][[2L]], subject_pairs[["CTL"]][[2L]], subject_pairs[["Designation"]][[2L]])
 )
 ```
 
