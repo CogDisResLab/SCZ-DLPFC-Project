@@ -8,6 +8,7 @@ render:
 
 uka:
   Rscript uka_analysis_single_sample.R
+  Rscript uka_analysis.R
 
 creeden:
   Rscript creedenzymatic_analysis.R
