@@ -231,7 +231,8 @@ krsa_heatmap_grouped(data_modeled[["grouped"]], clean_peptides, scale = "row")
 
 To compare between samples, a two-group comparison is performed. In this case, there are three group comparisons:
 
-- Case 1 vs Control 1
+- `r subject_pairs[["SCZ"]][[1L]]` vs `r subject_pairs[["CTL"]][[1L]]`
+- `r subject_pairs[["SCZ"]][[2L]]` vs `r subject_pairs[["CTL"]][[2L]]`
 
 The *Slope_Transformed* ratio between each group, paired by chip, is calculated to the fold change. Based on the fold change, peptides that pass a certain fold change threshold are considered significant hits. Also, quality control steps applied in each comparison to filter out peptides that do not reach specific criteria:
 
@@ -255,8 +256,8 @@ These *Filtering Parameters* (fold change threshold, QC criteria) can be modifie
 
 # Define Groups to be compared
 comparisons <- list(
-  COMP1 = c(subject_pairs[["SCZ"]][[1L]], subject_pairs[["CTL"]][[1L]]),
-  COMP2 = c(subject_pairs[["SCZ"]][[2L]], subject_pairs[["CTL"]][[2L]])
+  COMP1 = c(subject_pairs[["SCZ"]][[1L]], subject_pairs[["CTL"]][[1L]], subject_pairs[["Designation"]][[1L]]),
+  COMP2 = c(subject_pairs[["SCZ"]][[2L]], subject_pairs[["CTL"]][[2L]], subject_pairs[["Designation"]][[2L]]),
 )
 ```
 
@@ -271,6 +272,7 @@ comparisons <- list(
 
 case <- comparisons[["COMP1"]][[1L]]
 ctrl <- comparisons[["COMP1"]][[2L]]
+tag <- comparisons[["COMP1"]][[3L]]
 random <- "A"
 threshold <- params[["threshold"]]
 
@@ -296,6 +298,7 @@ cat(res, sep = "\n")
 
 case <- comparisons[["COMP2"]][[1L]]
 ctrl <- comparisons[["COMP2"]][[2L]]
+tag <- comparisons[["COMP2"]][[3L]]
 random <- "B"
 threshold <- params[["threshold"]]
 
