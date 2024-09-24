@@ -89,11 +89,11 @@ prepare_signal_data <- function(signal_path) {
 
 ## Perform analysis
 
-signal_files <- list.files("results", "dpp", full.names = TRUE) |>
+signal_files <- list.files("results", "signal", full.names = TRUE) |>
   set_names(
     ~ .x |>
       basename() |>
-      str_remove(fixed("-dpp")) |>
+      str_remove(fixed("-signal")) |>
       str_remove(".csv")
   ) |>
   discard(~ str_detect(.x, "R\\dC\\dP\\d"))
