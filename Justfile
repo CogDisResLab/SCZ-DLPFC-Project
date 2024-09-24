@@ -5,6 +5,8 @@ render:
   quarto render cell-level-run2.Rmd
   quarto render cell-level-run3.Rmd
   quarto render cell-level-run4.Rmd
+  quarto render haloperidol-rats.Rmd
+  quarto render region-level.Rmd
 
 uka:
   Rscript uka_analysis_single_sample.R

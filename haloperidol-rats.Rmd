@@ -227,7 +227,7 @@ krsa_heatmap_grouped(data_modeled[["grouped"]], clean_peptides, scale = "row")
 
 To compare between samples, a two-group comparison is performed. In this case, there are three group comparisons:
 
-- Case 1 vs Control 1
+- Haloperidol-treated Rats vs Control Rats
 
 The *Slope_Transformed* ratio between each group, paired by chip, is calculated to the fold change. Based on the fold change, peptides that pass a certain fold change threshold are considered significant hits. Also, quality control steps applied in each comparison to filter out peptides that do not reach specific criteria:
 
@@ -266,6 +266,7 @@ comparisons <- list(
 
 case <- comparisons[["COMP1"]][[1L]]
 ctrl <- comparisons[["COMP1"]][[2L]]
+tag <- "rats"
 random <- "A"
 threshold <- params[["threshold"]]
 
