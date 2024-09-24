@@ -41,7 +41,7 @@ knitr::opts_chunk$set( # nolint: extraction_operator_linter.
 )
 
 
-run_prefix <- "region-level"
+run_prefix <- "region-level-run"
 ```
 
 # Introduction
@@ -116,27 +116,31 @@ We will perform a couple of quality control steps to deal with negative values i
 #| label: "quality-control"
 
 # qc processing
-qc_data_separate <- krsa_qc_steps(raw_data) |>
+gendered_data <- krsa_qc_steps(raw_data) |>
   mutate(
     Group = case_when(
-      SampleName == "Female CT" ~ "F_CTL",
-      SampleName == "Male CT" ~ "M_CTL",
-      SampleName == "Female SCHZ" ~ "F_SCZ",
-      SampleName == "Male SCHZ" ~ "M_SCZ"
+      SampleName == "Female CT" ~ "CTL_F",
+      SampleName == "Female SCHZ" ~ "SCZ_F",
+      SampleName == "Male CT" ~ "CTL_M",
+      SampleName == "Male SCHZ" ~ "SCZ_M"
     ),
     SampleName = paste0(Group, "_", Barcode)
   )
 
-qc_data_pooled <- qc_data_separate |>
+pooled_data <- krsa_qc_steps(raw_data) |>
   mutate(
     Group = case_when(
-      Group %in% c("F_CTL", "M_CTL") ~ "CTL",
-      Group %in% c("F_SCZ", "M_SCZ") ~ "SCZ"
+      grepl("CT", SampleName) ~ "CTL",
+      grepl("SCHZ", SampleName) ~ "SCZ"
     ),
-    SampleName = str_c(SampleName, Group, sep = "_")
+    Barcode = case_when(
+      grepl("Female", SampleName) ~ paste0(Barcode, "F"),
+      grepl("Male", SampleName) ~ paste0(Barcode, "M")
+    ), 
+    SampleName = paste0(Group, "_", Barcode)
   )
 
-qc_data <- bind_rows(qc_data_separate, qc_data_pooled)
+qc_data <- bind_rows(gendered_data, pooled_data)
 
 groups <- unique(qc_data[["Group"]])
 
@@ -241,7 +245,11 @@ krsa_heatmap_grouped(data_modeled[["grouped"]], clean_peptides, scale = "row")
 
 To compare between samples, a two-group comparison is performed. In this case, there are three group comparisons:
 
-- Case 1 vs Control 1
+- `r groups[[2]]` vs `r groups[[1]]`
+- `r groups[[4]]` vs `r groups[[3]]`
+- `r groups[[1]]` vs `r groups[[3]]`
+- `r groups[[2]]` vs `r groups[[4]]`
+- Pooled SCZ vs Pooled CTL
 
 The *Slope_Transformed* ratio between each group, paired by chip, is calculated to the fold change. Based on the fold change, peptides that pass a certain fold change threshold are considered significant hits. Also, quality control steps applied in each comparison to filter out peptides that do not reach specific criteria:
 
@@ -267,7 +275,9 @@ These *Filtering Parameters* (fold change threshold, QC criteria) can be modifie
 comparisons <- list(
   COMP1 = c(groups[[2L]], groups[[1L]]),
   COMP2 = c(groups[[4L]], groups[[3L]]),
-  COMP3 = c(groups[[6L]], groups[[5L]])
+  COMP3 = c(groups[[1L]], groups[[3L]]),
+  COMP4 = c(groups[[2L]], groups[[4L]]),
+  COMP5 = c(groups[[6]], groups[[5]])
 )
 ```
 
@@ -282,6 +292,7 @@ comparisons <- list(
 
 case <- comparisons[["COMP1"]][[1L]]
 ctrl <- comparisons[["COMP1"]][[2L]]
+tag <- "Region"
 random <- "A"
 threshold <- params[["threshold"]]
 
@@ -307,6 +318,7 @@ cat(res, sep = "\n")
 
 case <- comparisons[["COMP2"]][[1L]]
 ctrl <- comparisons[["COMP2"]][[2L]]
+tag <- "Region"
 random <- "B"
 threshold <- params[["threshold"]]
 
@@ -332,7 +344,60 @@ cat(res, sep = "\n")
 
 case <- comparisons[["COMP3"]][[1L]]
 ctrl <- comparisons[["COMP3"]][[2L]]
+tag <- "Region"
 random <- "C"
+threshold <- params[["threshold"]]
+
+src <- knitr::knit_expand(
+  file = "_comparison.Rmd",
+  case = case, ctrl = ctrl, threshold = threshold,
+  chip = params[["chip_type"]]
+)
+
+res <- knitr::knit_child(text = src, quiet = TRUE)
+
+cat(res, sep = "\n")
+```
+
+```{r}
+#| results: "asis"
+#| echo: FALSE
+#| include: TRUE
+#| label: "childD"
+#| fig-width: 6
+#| fig-height: 6
+#| fig-cap: "Heatmap of pairwise group comparison"
+
+case <- comparisons[["COMP4"]][[1L]]
+ctrl <- comparisons[["COMP4"]][[2L]]
+tag <- "Region"
+random <- "D"
+threshold <- params[["threshold"]]
+
+src <- knitr::knit_expand(
+  file = "_comparison.Rmd",
+  case = case, ctrl = ctrl, threshold = threshold,
+  chip = params[["chip_type"]]
+)
+
+res <- knitr::knit_child(text = src, quiet = TRUE)
+
+cat(res, sep = "\n")
+```
+
+```{r}
+#| results: "asis"
+#| echo: FALSE
+#| include: TRUE
+#| label: "childE"
+#| fig-width: 6
+#| fig-height: 6
+#| fig-cap: "Heatmap of pairwise group comparison"
+
+case <- comparisons[["COMP5"]][[1L]]
+ctrl <- comparisons[["COMP5"]][[2L]]
+tag <- "Region"
+random <- "E"
 threshold <- params[["threshold"]]
 
 src <- knitr::knit_expand(
