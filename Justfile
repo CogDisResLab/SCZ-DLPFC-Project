@@ -7,7 +7,7 @@ render:
   quarto render cell-level-run4.Rmd
 
 uka:
-  Rscript uka_analysis.R
+  Rscript uka_analysis_single_sample.R
 
 creeden:
   Rscript creedenzymatic_analysis.R
