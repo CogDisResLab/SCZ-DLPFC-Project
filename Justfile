@@ -15,5 +15,6 @@ uka:
 creeden:
   Rscript creedenzymatic_analysis.R
   Rscript generate_quartile_plots.R
+  Rscript aggregate_creedenzymatic.R
 
 all: render uka creeden
