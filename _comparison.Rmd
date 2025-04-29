@@ -1,5 +1,4 @@
-\newpage
-### {{ case }} vs {{ ctrl }}
+### {{ case }} vs {{ ctrl}}
 
 ```{r}
 #| label: groupDiff{{random}}
@@ -19,7 +18,7 @@ data_modeled[["scaled"]] |>
   write_csv(
     file.path(
       "results",
-      "{{run_prefix}}-signal_{{tag}}_{{case}}_{{ctrl}}-{{chip}}.csv"
+      "{{run_prefix}}-signal_{{case}}_{{ctrl}}-{{chip}}.csv"
     )
   )
 
@@ -33,7 +32,7 @@ differential_phosphorylated_peptides <- krsa_group_diff(
 # save LFC table
 write_csv(
   differential_phosphorylated_peptides,
-  file.path("results", "{{run_prefix}}-dpp_{{tag}}_{{case}}_{{ctrl}}-{{chip}}.csv")
+  file.path("results", "{{run_prefix}}-dpp_{{case}}_{{ctrl}}-{{chip}}.csv")
 )
 
 # Extract top peptides based on the LFC cutoff using average of LFCs across chips
@@ -117,10 +116,6 @@ if (params[["chip_type"]] == "STK") {
 }
 
 
-# For parallel computing, load the furrr package:
-# opens multiple R sessions to run faster
-plan(multisession)
-
 # Run the KRSA function across the different sets of peptides using the furrr package for parallel computing
 mutiple_krsa_outputs <- future_map(sigPeps_total, krsa,
   .options = furrr_options(seed = TRUE), return_count = TRUE
@@ -128,11 +123,9 @@ mutiple_krsa_outputs <- future_map(sigPeps_total, krsa,
 saveRDS(mutiple_krsa_outputs,
   file = file.path(
     "datastore",
-    "{{run_prefix}}-multiple_krsa_output_{{tag}}_{{case}}_{{ctrl}}_{{chip}}.RDS"
+    "{{run_prefix}}-multiple_krsa_output_{{case}}_{{ctrl}}_{{chip}}.RDS"
   )
 )
-
-plan(sequential)
 
 mutiple_krsa_outputs <- mutiple_krsa_outputs |>
   map(~ pluck(.x, "KRSA_Table"))
@@ -174,7 +167,7 @@ AvgZTable2 |>
   write_csv(
     file.path(
       "results",
-      "{{run_prefix}}-krsa_table_{{tag}}_{{case}}_{{ctrl}}_{{chip}}.csv"
+      "{{run_prefix}}-krsa_table_{{case}}_{{ctrl}}_{{chip}}.csv"
     )
   ) |>
   select(Kinase, AvgZ) |>
