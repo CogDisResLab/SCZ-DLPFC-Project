@@ -1,0 +1,6 @@
+[tools]
+"cargo:cargo-binstall" = "1.12.3"
+"cargo:qsv" = "4.0.0"
+
+[env]
+RENV_CONFIG_USER_PROFILE = "TRUE"
