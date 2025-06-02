@@ -39,7 +39,7 @@ quartile_figure <- function(df, grouping = "KinaseFamily") {
         )
       }
     } +
-    ggplot2::scale_shape_manual(values = c(Yes = 19, No = 1)) +
+    ggplot2::scale_shape_manual(values = c(Yes = 19L, No = 1L)) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(
       angle = 30L,
       size = 7.5,
@@ -56,7 +56,7 @@ generate_quartile_plot <- function(datafile) {
   )
 
   sig_kinases <- creeden_data |>
-    dplyr::filter(Method == "KRSA", Qrt >= 4) |>
+    dplyr::filter(Method == "KRSA", Qrt >= 4L) |>
     dplyr::pull(hgnc_symbol) |>
     unique()
 
