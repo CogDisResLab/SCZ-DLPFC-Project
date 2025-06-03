@@ -90,7 +90,7 @@ process_creeden_file <- function(filename) {
     mutate(Method = if_else(Method == "PTM-SEA", "PTMSEA", Method)) |>
     select(Kinase, HGNC = hgnc_symbol, Method, Perc) |>
     mutate(Score = Perc) |>
-    pivot_wider(names_from = Method, values_from = Score, values_fill = -1L, values_fn = unique) |>
+    pivot_wider(id_cols = HGNC, names_from = Method, values_from = Score, values_fill = -1L, values_fn = unique) |>
     mutate(
       CombinedScore = pmap_dbl(
         list(KRSA, UKA, KEA3, PTMSEA),

@@ -151,7 +151,7 @@ creeden_data <- read_csv(file.path("results", "CTL_F_CTL_M_STK_creedenzymatic.cs
     mutate(Method = if_else(Method == "PTM-SEA", "PTMSEA", Method)) |>
     select(Kinase, HGNC = hgnc_symbol, Method, Perc) |>
     mutate(Score = Perc) |>
-    pivot_wider(names_from = Method, values_from = Score, values_fill = -1L, values_fn = unique) |>
+    pivot_wider(id_cols = HGNC, names_from = Method, values_from = Score, values_fill = -1L, values_fn = unique) |>
     mutate(
         CombinedScore = pmap_dbl(
             list(KRSA, UKA, KEA3, PTMSEA),
