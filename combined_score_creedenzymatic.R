@@ -112,4 +112,7 @@ results <- creedenzymatic_results |>
   map(process_creeden_file) |>
   imap(
     ~ write_csv(.x, file.path("results", .y))
-  )
+  ) |>
+  imap(~ select(.x, HGNC, CombinedScore = Rescaled)) |>
+  bind_rows(.id = "Dataset") |>
+  write_csv(file.path("results", "collected_combined_scores.csv"))

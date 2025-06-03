@@ -22,7 +22,7 @@ core_dataset <- list.files("results",
   keep(~ str_detect(.x, "SCZ_\\d+_CTL_\\d+")) |> # nolint: nonportable_path_linter.
   set_names(~ basename(.x) |> str_remove("_STK_creedencombined.csv")) |>
   map(~ read.csv(.x)) |>
-  map(~ select(.x, HGNC, Score = CombinedScore)) |>
+  map(~ select(.x, HGNC, Score = Rescaled)) |>
   map(~ distinct(.x)) |>
   map(~ arrange(.x, desc(abs(Score)))) |>
   map(~ mutate(
