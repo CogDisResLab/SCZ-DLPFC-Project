@@ -1,20 +1,8 @@
 # Do pairwise correlation of all relevant samples
+# Using shared utility functions
 
-suppressPackageStartupMessages({
-    library(tidyverse)
-    library(rstatix)
-})
+# Source shared functions
+source("utils/data_processing_functions.R")
 
-creedencombined_files <- list.files("results", "creedencombined") |>
-    set_names(~ str_remove(.x, fixed("_STK_creedencombined.csv")))
-
-combined_data <- creedencombined_files |>
-    map(~ read_csv(file.path("results", .x))) |>
-    map(~ select(.x, HGNC, Rescaled)) |>
-    bind_rows(.id = "Dataset") |>
-    pivot_wider(names_from = Dataset, values_from = Rescaled, values_fill = 0L) |>
-    select(-HGNC)
-
-correlations <- combined_data |>
-    cor_test(method = "spearman") |>
-    write_csv(file.path("results", "combined_score_correlations.csv"))
+# Perform correlation analysis
+correlations <- perform_correlation_analysis()

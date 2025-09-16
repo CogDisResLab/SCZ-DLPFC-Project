@@ -19,7 +19,7 @@ linters: linters_with_tags(
         r_version = "4.0.0"
     ),
     indentation_linter(
-        indent = 2L,
+        indent = 4L,
         hanging_indent_style = c("tidy"),
         assignment_as_infix = TRUE
     ),

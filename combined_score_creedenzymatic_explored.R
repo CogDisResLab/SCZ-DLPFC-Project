@@ -1,46 +1,10 @@
 # Develop a library to calculate a combined score for each kinase
+# Using shared utility functions
 
-library(creedenzymatic)
-library(tidyverse)
-
+# Source shared functions
+source("utils/data_processing_functions.R")
 
 kinome <- kinome_mp_file
-
-calculate_weights <- function() {
-    kinome <- kinome_mp_file
-
-    total_kinases <- nrow(kinome)
-    krsa <- kinome |>
-        pull(krsa_id) |>
-        keep(~ !is.na(.x)) |>
-        length()
-    uka <- kinome |>
-        pull(uka_id) |>
-        keep(~ !is.na(.x)) |>
-        length()
-    kea3 <- kinome |>
-        pull(kea3_id) |>
-        keep(~ !is.na(.x)) |>
-        length()
-    ptmsea <- kinome |>
-        pull(ptmsea_id) |>
-        keep(~ !is.na(.x)) |>
-        length()
-
-    coverage <- c(
-        KRSA = round(krsa / total_kinases, 6L),
-        UKA = round(uka / total_kinases, 6L),
-        KEA3 = round(kea3 / total_kinases, 6L),
-        PTMSEA = round(ptmsea / total_kinases, 6L)
-    )
-
-    normalized_coverage <- round(coverage / sum(coverage), 4L)
-
-    list(
-        coverage = coverage,
-        normalized_coverage = normalized_coverage
-    )
-}
 
 penalty_scale <- seq(0L, 1L, 0.05)
 

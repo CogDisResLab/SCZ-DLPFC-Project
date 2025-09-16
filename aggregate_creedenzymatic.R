@@ -1,35 +1,11 @@
 # Reformat and merge creedenzymatic files for interpretation
+# Using shared utility functions
 
-library(tidyverse)
+# Source shared functions
+source("utils/data_processing_functions.R")
 
 creedenzymatic_files <- list.files("results", "creedenzymatic", full.names = TRUE) |>
   set_names(~ str_remove(basename(.x), "_creedenzymatic.csv"))
-
-combine_score <- function(ptmsea, kea3, uka, krsa) {
-  # Weights for each method, showing the level of confidence
-  # in the method as a percentage.
-  weights <- c(0.8, 0.8, 0.9, 1.0)
-  # Penalty for each method, showing the level of confidence
-  # lost, when the method returns no result.
-  penalties <- c(0.9, 0.9, 0.5, 0.6)
-  applicable_penalties <- penalties * (c(ptmsea, kea3, uka, krsa) == -1L)
-  penalty_factor <- reduce(
-    applicable_penalties[applicable_penalties != 0L],
-    `*`,
-    .init = 1L
-  )
-
-  mean_value <- weighted.mean(c(ptmsea, kea3, uka, krsa),
-    weights,
-    na.rm = TRUE
-  )
-
-  mean_value * penalty_factor
-}
-
-combine_score_v <- Vectorize(combine_score,
-  vectorize.args = c("ptmsea", "kea3", "uka", "krsa")
-)
 
 
 creedenzymatic_data <- creedenzymatic_files |>

@@ -10,3 +10,4 @@ x-*.R
 *.log
 *.html
 *.png
+.vscode/

@@ -1,39 +1,8 @@
 # Creedenzymatic Analysis
+# Using shared utility functions
 
-library(tidyverse)
-library(creedenzymatic)
-
-process_creedenzymatic <- function(krsa_path, uka_path, peptide_path) {
-  krsa_data <- read_csv(krsa_path, show_col_types = FALSE) |>
-    select(Kinase, Score = AvgZ) |>
-    read_krsa(trns = "abs", sort = "desc")
-
-  uka_data <- read_csv(uka_path, show_col_types = FALSE) |>
-    select(Kinase = `Kinase Name`, Score = `Median Final score`) |>
-    read_uka(trns = "abs", sort = "desc")
-
-  peptide_data <- read_csv(peptide_path, show_col_types = FALSE) |>
-    select(Peptide, Score = totalMeanLFC)
-
-  kea3_data <- read_kea(
-    peptide_data,
-    sort = "asc",
-    trns = "abs",
-    method = "MeanRank",
-    lib = "kinase-substrate"
-  )
-
-  ptmsea_data <- read_ptmsea(peptide_data)
-
-  combined <- combine_tools(
-    KRSA_df = krsa_data,
-    UKA_df = uka_data,
-    KEA3_df = kea3_data,
-    PTM_SEA_df = ptmsea_data
-  )
-
-  combined
-}
+# Source shared functions
+source("utils/data_processing_functions.R")
 
 krsa_files <- list.files("results", "krsa", full.names = TRUE)
 
