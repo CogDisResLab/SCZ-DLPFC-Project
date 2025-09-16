@@ -128,7 +128,7 @@ comparative_reverse_krsa <- function(kinase, dataset) {
             breaks = seq(-2.6, 2.6, 0.2)
         ) +
         scale_x_discrete(name = "Subject Pair", limits = order) +
-        scale_size_continuous(limits = c(0L, 1.1L), name = "Effect Size", breaks = seq(0L, 1L, 0.2)) +
+        scale_size_continuous(limits = c(0L, 1.1), name = "Effect Size", breaks = seq(0L, 1L, 0.2)) +
         theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 24L)) +
         guides(fill = "none", color = "none")
 
