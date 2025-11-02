@@ -95,6 +95,8 @@ differed <- c("JNK", "ERK", "P38") |>
     map(~ calculate_pair_differences(processed, .x))
 
 p38 <- differed[["P38"]]
+jnk <- differed[["JNK"]]
+erk <- differed[["ERK"]]
 
 comparative_reverse_krsa <- function(kinase, dataset) {
     plot_data <-

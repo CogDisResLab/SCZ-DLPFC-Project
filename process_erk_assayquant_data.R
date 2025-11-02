@@ -1,0 +1,1 @@
+# Extract assayquant levels

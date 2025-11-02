@@ -61,8 +61,8 @@ ggplot2::ggsave("pairwise_correlations.png",
 
 
 ggplot2::ggsave("pairwise_correlations.svg",
-    width = 10L,
-    height = 7L,
+    width = 18L,
+    height = 5L,
     units = "in",
     path = "figures",
     plot = p,

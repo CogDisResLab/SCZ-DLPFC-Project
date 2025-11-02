@@ -62,8 +62,9 @@ p <- g + geom_tile() +
     ) +
     theme_minimal() +
     scale_y_discrete(limits = rev(ranked_data$Kinase)) +
+    xlab("") + ylab("") +
     guides(fill = "none")
 
-ggsave("KRSA_Quartile_Rank_by_Dataset.png", plot = p, path = "figures", width = 6.5, height = 9L, units = "in", bg = "white")
+ggsave("KRSA_Quartile_Rank_by_Dataset.png", plot = p, path = "figures", width = 10L, height = 17L, units = "in", bg = "white")
 
-ggsave("KRSA_Quartile_Rank_by_Dataset.svg", plot = p, path = "figures", width = 6.5, height = 9L, units = "in", bg = "transparent")
+ggsave("KRSA_Quartile_Rank_by_Dataset.svg", plot = p, path = "figures", width = 10L, height = 17L , units = "in", bg = "transparent")
