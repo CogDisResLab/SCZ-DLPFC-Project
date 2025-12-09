@@ -26,7 +26,9 @@ scz <- read_excel(filepath, range = "F17:G36", col_names = c("Sample", "Class"),
 
 sample_mapping <- lysates |>
     bind_rows(controls) |>
-    bind_rows(scz)
+    bind_rows(scz) |>
+    group_by(Class) |>
+    mutate(Class = str_c(Class, str_pad(seq_along(Class), width = 2, pad = "0")))
 
 assay_control_mapping <- well_layout |>
     select(Sample) |>
@@ -36,14 +38,14 @@ assay_control_mapping <- well_layout |>
         str_detect(Sample, fixed("no reporter")) ~ "BLNK_LYS",
         str_detect(Sample, "5000ng.*ERK") ~ "LYS_INH",
         str_detect(Sample, "5000ng.*HI") ~ "LYS_HI",
+        str_detect(Sample, "125\\s*nM") ~ "ERK_0.125nM",
+        str_detect(Sample, "75\\s*nM") ~ "ERK_0.750nM",
+        str_detect(Sample, "25\\s*nM") ~ "ERK_0.250nM",
         str_detect(Sample, "2nM.*INH") ~ "ERK_2.000nM_INH",
         str_detect(Sample, "2\\s*nM") ~ "ERK_2.000nM",
         str_detect(Sample, "1.5\\s*nM") ~ "ERK_1.500nM",
         str_detect(Sample, "1\\s*nM") ~ "ERK_1.000nM",
-        str_detect(Sample, "75\\s*nM") ~ "ERK_0.750nM",
         str_detect(Sample, "5\\s*nM") ~ "ERK_0.500nM",
-        str_detect(Sample, "25\\s*nM") ~ "ERK_0.250nM",
-        str_detect(Sample, "125\\s*nM") ~ "ERK_0.125nM",
         is.na(Sample) ~ "EMPTY",
         .default = Class
     ))
