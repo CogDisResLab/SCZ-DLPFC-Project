@@ -51,5 +51,6 @@ assay_control_mapping <- well_layout |>
     ))
 
 combined <- well_layout |>
-    inner_join(assay_control_mapping) |>
+    inner_join(assay_control_mapping, relationship = "many-to-many") |>
+    unique() |>
     write_csv(file.path("kinome_data", "erk_assayquant_plate_layout.csv"))
